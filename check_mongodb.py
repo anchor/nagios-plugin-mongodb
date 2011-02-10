@@ -89,18 +89,18 @@ def main(argv):
     if sresult:
 	 warning = 2
     else:
-	 warning = int(warning_string)
+	 warning = float(warning_string)
 
     sresult = sregex.search(critical_string)
     if sresult:
 	 critical = 5
     else:
-	 critical = int(critical_string)
+	 critical = float(critical_string)
 
     if action == "connections":
-        check_connections(host, port, warning, critical)
+        check_connections(host, port, int(warning), int(critical))
     elif action == "replication_lag":
-        check_rep_lag(host, port, warning, critical)
+        check_rep_lag(host, port, int(warning), int(critical))
     elif action == "replset_state":
         check_replset_state(host, port)
     elif action == "memory":
@@ -211,9 +211,6 @@ def check_memory(host, port, warning, critical):
         #  
         mem = float(data['mem']['resident']) / 1000.0
         
-        warning = float(warning)
-        critical = float(critical)
-        
         if mem >= critical:
             print "CRITICAL - Memory Usage: %f GByte" % mem
             sys.exit(2)
@@ -243,9 +240,6 @@ def check_lock(host, port, warning, critical):
         # convert to gigs
         #  
         lock = float(data['globalLock']['lockTime']) / float(data['globalLock']['totalTime'])
-
-        warning = float(warning)
-        critical = float(critical)
         
         if lock >= critical:
             print "CRITICAL - Lock Percentage: %s" % ("%.2f" % round(lock,2))
@@ -273,9 +267,6 @@ def check_flushing(host, port, warning, critical):
             data = con.admin.command(pymongo.son.SON([('serverStatus', 1)]))
 
         avg_flush = float(data['backgroundFlushing']['average_ms'])
-
-        warning = float(warning)
-        critical = float(critical)
 
         if avg_flush >= critical:
             print "CRITICAL - Avg Flush Time: %sms" % ("%.2f" % round(avg_flush,2))
